@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: banksense-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-banksense}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-banksense_local}
+      POSTGRES_DB: ${POSTGRES_DB:-banksense}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - banksense_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-banksense} -d ${POSTGRES_DB:-banksense}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  banksense_pgdata:

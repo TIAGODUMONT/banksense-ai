@@ -1,0 +1,21 @@
+# Ambiente
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Segredos
+.env
+
+# Dados gerados (reproduzíveis pelo gerador)
+data/raw/*.csv
+data/processed/*.csv
+data/processed/*.parquet
+!data/**/.gitkeep
+
+# Modelos treinados (reproduzíveis pelo treino); as métricas ficam versionadas
+models/*.joblib
+
+# Gerado pelo pip install -e .
+*.egg-info/
