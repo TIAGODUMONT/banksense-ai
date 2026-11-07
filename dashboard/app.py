@@ -113,10 +113,10 @@ with st.sidebar:
     data_min, data_max = base["data_mensagem"].min().date(), base["data_mensagem"].max().date()
     periodo = st.date_input("Período", (data_min, data_max), min_value=data_min, max_value=data_max,
                             format="DD/MM/YYYY")
-    categorias = st.multiselect("Categoria", sorted(base["Categoria"].unique()))
-    canais = st.multiselect("Canal", sorted(base["Canal"].unique()))
-    regioes = st.multiselect("Região", sorted(base["Região"].dropna().unique()))
-    segmentos = st.multiselect("Segmento", sorted(base["Segmento"].dropna().unique()))
+    categorias = st.multiselect("Categoria", sorted(base["Categoria"].unique()), placeholder="Todas")
+    canais = st.multiselect("Canal", sorted(base["Canal"].unique()), placeholder="Todos")
+    regioes = st.multiselect("Região", sorted(base["Região"].dropna().unique()), placeholder="Todas")
+    segmentos = st.multiselect("Segmento", sorted(base["Segmento"].dropna().unique()), placeholder="Todos")
     st.divider()
     st.caption(f"Fonte: {origem}")
     st.caption("⚠️ Dados 100% sintéticos, gerados para estudo.")
@@ -305,7 +305,8 @@ with aba_historia:
     )
     c1, c2 = st.columns(2)
     with c1:
-        med = (resolvidas.groupby("Canal")["tempo_resolucao_horas"].median().sort_values().reset_index())
+        med = (resolvidas[resolvidas["Canal"] != "Não informado"].groupby("Canal")["tempo_resolucao_horas"]
+               .median().sort_values().reset_index())
         fig = px.bar(med, x="tempo_resolucao_horas", y="Canal", orientation="h",
                      text=med["tempo_resolucao_horas"].map(lambda v: f"{fmt(v, 1)} h"),
                      color_discrete_sequence=[AZUL])

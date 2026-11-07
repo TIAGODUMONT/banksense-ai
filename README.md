@@ -66,6 +66,30 @@ Estilo Power BI, com indicadores, filtros globais e uma página **"A História"*
 o cenário, onde estão as reclamações, quando pioraram e como o atendimento responde.
 Os textos são calculados a partir dos dados filtrados.
 
+![Visão geral do dashboard](docs/imagens/00_visao_geral.png)
+
+<details>
+<summary><b>Ver a página "A História" completa</b></summary>
+
+![A História: storytelling em 4 capítulos](docs/imagens/01_historia.png)
+
+</details>
+
+| Reclamações | Atendimento | Clientes |
+|---|---|---|
+| ![Reclamações](docs/imagens/02_reclamacoes.png) | ![Atendimento](docs/imagens/03_atendimento.png) | ![Clientes](docs/imagens/04_clientes.png) |
+
+### Publicar no Render
+
+O arquivo [`render.yaml`](render.yaml) já tem tudo configurado. Na nuvem não há PostgreSQL:
+os dados são gerados e limpos durante a instalação (mesma semente, mesmo resultado) e o dashboard lê o arquivo tratado.
+
+1. Crie uma conta em [render.com](https://render.com) entrando com o GitHub.
+2. Clique em **New +** → **Blueprint** e escolha o repositório `banksense-ai`.
+3. Confirme em **Apply**. O Render instala, gera os dados e coloca o dashboard no ar.
+
+No plano gratuito, o serviço "dorme" depois de 15 minutos sem acesso; a primeira visita depois disso leva cerca de 1 minuto.
+
 ## Como rodar
 
 Pré-requisitos: Python 3.11+ e Docker Desktop.

@@ -5,6 +5,8 @@ Lê do PostgreSQL quando ele está disponível; se não estiver, usa o arquivo t
 
 from __future__ import annotations
 
+import os
+
 import pandas as pd
 from sqlalchemy.exc import OperationalError
 
@@ -48,10 +50,13 @@ def _ler_arquivo() -> pd.DataFrame:
 
 def carregar() -> tuple[pd.DataFrame, str]:
     """Devolve (dados prontos para o dashboard, origem dos dados)."""
-    try:
-        df, origem = _ler_banco(), "PostgreSQL"
-    except OperationalError:
-        df, origem = _ler_arquivo(), "arquivo tratado (PostgreSQL indisponível)"
+    if os.getenv("BANKSENSE_FONTE_DADOS") == "arquivo":
+        df, origem = _ler_arquivo(), "arquivo tratado"
+    else:
+        try:
+            df, origem = _ler_banco(), "PostgreSQL"
+        except OperationalError:
+            df, origem = _ler_arquivo(), "arquivo tratado (PostgreSQL indisponível)"
 
     df["data_mensagem"] = pd.to_datetime(df["data_mensagem"])
     df["tempo_resolucao_horas"] = pd.to_numeric(df["tempo_resolucao_horas"], errors="coerce")

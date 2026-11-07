@@ -5,7 +5,21 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-RAIZ = Path(__file__).resolve().parents[2]
+def _descobrir_raiz() -> Path:
+    """Raiz do projeto: BANKSENSE_RAIZ, a pasta do código-fonte (modo editável) ou a pasta atual.
+
+    Quando o pacote é instalado sem -e (como no deploy), __file__ fica dentro do site-packages,
+    então a raiz passa a ser a pasta onde o comando foi executado.
+    """
+    if os.getenv("BANKSENSE_RAIZ"):
+        return Path(os.environ["BANKSENSE_RAIZ"]).resolve()
+    fonte = Path(__file__).resolve().parents[2]
+    if (fonte / "pyproject.toml").exists():
+        return fonte
+    return Path.cwd()
+
+
+RAIZ = _descobrir_raiz()
 
 DIR_DADOS = RAIZ / "data"
 DIR_BRUTOS = DIR_DADOS / "raw"

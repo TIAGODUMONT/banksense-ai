@@ -1,0 +1,19 @@
+# Instruções para o Render (https://render.com) colocar o dashboard no ar.
+# Na nuvem não há PostgreSQL: os dados sintéticos são gerados e limpos durante o build
+# (semente fixa, então o resultado é idêntico ao local) e o dashboard lê o arquivo tratado.
+services:
+  - type: web
+    name: banksense-ai
+    runtime: python
+    plan: free
+    buildCommand: >-
+      pip install -r requirements-deploy.txt &&
+      pip install --no-deps . &&
+      python -m banksense.dados.gerador &&
+      python -m banksense.dados.limpeza
+    startCommand: >-
+      streamlit run dashboard/app.py
+      --server.port $PORT --server.address 0.0.0.0 --server.headless true
+    envVars:
+      - key: BANKSENSE_FONTE_DADOS
+        value: arquivo  # não tenta conectar no PostgreSQL
