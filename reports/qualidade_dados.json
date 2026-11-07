@@ -1,0 +1,70 @@
+{
+  "linhas_brutas": 50616,
+  "linhas_tratadas": 49278,
+  "nulos_antes": {
+    "id_mensagem": 0,
+    "id_cliente": 0,
+    "data_mensagem": 0,
+    "canal": 997,
+    "categoria": 0,
+    "texto": 729,
+    "sentimento_referencia": 0,
+    "nota_satisfacao": 1524,
+    "tempo_resolucao_horas": 9027,
+    "regiao": 509,
+    "situacao": 0,
+    "tipo_texto": 0
+  },
+  "nulos_depois": {
+    "id_mensagem": 0,
+    "id_cliente": 0,
+    "data_mensagem": 0,
+    "canal": 965,
+    "categoria": 0,
+    "texto": 0,
+    "sentimento_referencia": 0,
+    "nota_satisfacao": 1701,
+    "tempo_resolucao_horas": 8936,
+    "regiao": 0,
+    "situacao": 0,
+    "tipo_texto": 0,
+    "tempo_outlier": 0
+  },
+  "duplicatas_exatas": 616,
+  "ids_repetidos_restantes": 0,
+  "valores_distintos_antes": {
+    "canal": 40,
+    "regiao": 31,
+    "categoria": 48,
+    "sentimento_referencia": 15
+  },
+  "valores_distintos_depois": {
+    "canal": 6,
+    "regiao": 5,
+    "categoria": 9,
+    "sentimento_referencia": 3
+  },
+  "valores_invalidos_apos_padronizar": {
+    "canal": 0,
+    "regiao": 0,
+    "categoria": 0,
+    "sentimento_referencia": 0,
+    "situacao": 0
+  },
+  "datas_formato_br": 2522,
+  "datas_invalidas": 0,
+  "notas_fora_da_faixa": 231,
+  "tempos_negativos": 132,
+  "tempos_outliers": 60,
+  "limite_outlier_horas": 2907.0,
+  "limites_outlier_por_canal": {
+    "app": 504.5,
+    "chat": 94.7,
+    "email": 3326.1,
+    "ouvidoria": 10886.3,
+    "redes_sociais": 1136.9,
+    "telefone": 65.0
+  },
+  "regioes_imputadas_pelo_cliente": 504,
+  "linhas_removidas_sem_texto": 722
+}
