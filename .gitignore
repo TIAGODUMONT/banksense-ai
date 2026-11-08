@@ -13,6 +13,7 @@ data/raw/*.csv
 data/processed/*.csv
 data/processed/*.parquet
 data/bigquery/
+data/powerbi/
 !data/**/.gitkeep
 
 # Modelos treinados (reproduzíveis pelo treino); as métricas ficam versionadas

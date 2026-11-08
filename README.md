@@ -16,6 +16,7 @@ geração de dados, limpeza, banco de dados, estatística, Machine Learning e um
 | 4 | Classificador de sentimentos e previsão de volume | ⏳ |
 | 5 | API com FastAPI | ⏳ |
 | 6 | Dashboard Streamlit | ✅ (análises) · ⏳ (aba do modelo) |
+| 6b | Dashboard Power BI (DAX e star schema) | ✅ |
 | 7 | Documentação final em português e inglês | ⏳ |
 
 ## O problema de negócio
@@ -88,6 +89,25 @@ Exemplo: a consulta de mensagens negativas por mês encontra sozinha o evento de
 Para reproduzir: crie um dataset no BigQuery e carregue os arquivos Parquet de `data/processed/`
 (pelo console: **Criar tabela → Fazer upload → Parquet**).
 
+## Dashboard em Power BI
+
+O mesmo star schema também virou um relatório no **Power BI Desktop** ([`powerbi/BankSense_Dashboard.pbix`](powerbi/BankSense_Dashboard.pbix)):
+
+![Dashboard do BankSense no Power BI](docs/imagens/05_powerbi.png)
+
+- **Modelo:** `fato_mensagens` ligada a `dim_clientes` e a uma tabela calendário criada em DAX (`dCalendario`), todas em relacionamento muitos para um.
+- **Medidas DAX:** Total Mensagens (`COUNTROWS`), % Negativas e % Resolvidas (`CALCULATE` + `DIVIDE`), Nota Média, Mediana de Resolução (`MEDIAN`) e Clientes Atendidos (`DISTINCTCOUNT`).
+- **Leitura:** o gráfico mensal mostra sozinho o pico de nov/2025 (instabilidade do aplicativo); fraude e segurança é a categoria com mais mensagens negativas; ouvidoria e e-mail são os canais mais lentos.
+- **Filtros:** segmento do cliente e canal, aplicados à página inteira.
+
+Os CSVs que o Power BI lê saem do script [`exportar_powerbi.py`](src/banksense/dados/exportar_powerbi.py), que traduz os rótulos e usa o formato brasileiro (`;` e vírgula decimal):
+
+```bash
+python -m banksense.dados.exportar_powerbi   # gera data/powerbi/*.csv
+```
+
+O `.pbix` já vem com os dados carregados. Para atualizar a partir da sua máquina, abra **Transformar dados → Configurações da fonte de dados** e aponte os dois CSVs para a sua pasta `data/powerbi/`.
+
 ## Dashboard
 
 Estilo Power BI, com indicadores, filtros globais e uma página **"A História"** que conta, em 4 capítulos,
@@ -145,6 +165,7 @@ pytest                                     # testes
 ```
 banksense-ai/
 ├── dashboard/            # app Streamlit
+├── powerbi/              # relatório Power BI (.pbix)
 ├── data/raw/             # dados brutos (gerados, fora do Git)
 ├── data/processed/       # dados tratados (gerados, fora do Git)
 ├── docs/                 # premissas da geração
@@ -161,7 +182,7 @@ banksense-ai/
 
 ## Tecnologias
 
-Python · Pandas · NumPy · PostgreSQL · SQLAlchemy · Docker Compose · BigQuery (Google Cloud) · Streamlit · Plotly · Pytest · logging
+Python · Pandas · NumPy · PostgreSQL · SQLAlchemy · Docker Compose · BigQuery (Google Cloud) · Power BI (DAX) · Streamlit · Plotly · Pytest · logging
 (em seguida: SciPy, Statsmodels, Scikit-learn, FastAPI, Pydantic, Joblib)
 
 ## Summary (English)
@@ -170,7 +191,7 @@ Python · Pandas · NumPy · PostgreSQL · SQLAlchemy · Docker Compose · BigQu
 digital bank. All data is **synthetic** and generated from documented assumptions. Done so far: Dockerized PostgreSQL,
 a reproducible generator of 50,000 Portuguese messages (slang, typos, irony, controlled data-quality issues),
 a cleaning pipeline with a data-quality report and logging, the data loaded into BigQuery (Google Cloud) as a
-star schema with SQL analyses, and a Power BI-style Streamlit dashboard with data storytelling.
+star schema with SQL analyses, a Power BI report with DAX measures, and a Power BI-style Streamlit dashboard with data storytelling.
 Next: statistics notebooks, sentiment classifier (TF-IDF + Logistic Regression), complaint volume forecasting and a FastAPI service.
 
 ---
