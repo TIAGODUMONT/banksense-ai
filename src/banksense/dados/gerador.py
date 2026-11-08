@@ -19,6 +19,9 @@ import pandas as pd
 from banksense import config
 from banksense.dados import premissas as P
 from banksense.dados.textos import aplicar_ruido, montar_texto
+from banksense.logs import obter_logger
+
+log = obter_logger("banksense.gerador")
 
 SENTIMENTOS = ("negativo", "neutro", "positivo")
 
@@ -214,12 +217,13 @@ def main() -> None:
     parser.add_argument("--semente", type=int, default=config.SEMENTE_PADRAO)
     args = parser.parse_args()
 
+    log.info("Geração iniciada: %s mensagens, semente %s", f"{args.n:,}", args.semente)
     clientes, mensagens = gerar(args.n, args.semente)
     config.DIR_BRUTOS.mkdir(parents=True, exist_ok=True)
     clientes.to_csv(config.ARQ_CLIENTES_BRUTO, index=False, encoding="utf-8")
     mensagens.to_csv(config.ARQ_MENSAGENS_BRUTO, index=False, encoding="utf-8")
-    print(f"Clientes: {len(clientes):,} -> {config.ARQ_CLIENTES_BRUTO}")
-    print(f"Mensagens brutas: {len(mensagens):,} -> {config.ARQ_MENSAGENS_BRUTO}")
+    log.info("Clientes: %s -> %s", f"{len(clientes):,}", config.ARQ_CLIENTES_BRUTO)
+    log.info("Mensagens brutas: %s -> %s", f"{len(mensagens):,}", config.ARQ_MENSAGENS_BRUTO)
 
 
 if __name__ == "__main__":

@@ -10,6 +10,9 @@ from sqlalchemy import Engine, text
 
 from banksense import config
 from banksense.db import obter_engine
+from banksense.logs import obter_logger
+
+log = obter_logger("banksense.migracoes")
 
 DIR_MIGRACOES = config.DIR_SQL / "migrations"
 
@@ -35,17 +38,14 @@ def aplicar_migracoes(engine: Engine | None = None) -> list[str]:
         with engine.begin() as con:  # cada migration em uma transação
             con.exec_driver_sql(sql)
             con.execute(text("INSERT INTO schema_migrations (versao) VALUES (:v)"), {"v": arquivo.name})
+        log.info("Migration aplicada: %s", arquivo.name)
         aplicadas_agora.append(arquivo.name)
     return aplicadas_agora
 
 
 def main() -> None:
-    aplicadas = aplicar_migracoes()
-    if aplicadas:
-        for nome in aplicadas:
-            print(f"Aplicada: {nome}")
-    else:
-        print("Nenhuma migration pendente.")
+    if not aplicar_migracoes():
+        log.info("Nenhuma migration pendente.")
 
 
 if __name__ == "__main__":

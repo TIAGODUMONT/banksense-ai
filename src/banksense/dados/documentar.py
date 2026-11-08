@@ -8,6 +8,9 @@ from __future__ import annotations
 
 from banksense import config
 from banksense.dados import premissas as P
+from banksense.logs import obter_logger
+
+log = obter_logger("banksense.documentar")
 
 
 def _pct(x: float) -> str:
@@ -130,7 +133,7 @@ def main() -> None:
     destino = config.RAIZ / "docs" / "premissas_geracao.md"
     destino.parent.mkdir(parents=True, exist_ok=True)
     destino.write_text(gerar_markdown(), encoding="utf-8")
-    print(f"Documentação gerada em {destino}")
+    log.info("Documentação gerada em %s", destino)
 
 
 if __name__ == "__main__":

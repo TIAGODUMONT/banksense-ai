@@ -60,6 +60,34 @@ flowchart LR
 
 Relatório completo: [`reports/qualidade_dados.md`](reports/qualidade_dados.md).
 
+O pipeline registra **logs** (níveis INFO, WARNING e ERROR) no terminal e em `logs/banksense.log`:
+
+```
+2026-11-07 22:16:42 WARNING banksense.limpeza | Valores fora da faixa viraram nulo: 4 notas, 5 tempos negativos
+2026-11-07 22:16:58 INFO    banksense.limpeza | Limpeza concluída: 50,616 brutas -> 49,278 tratadas
+```
+
+## BankSense no BigQuery (Google Cloud)
+
+Os dados tratados também foram carregados no **BigQuery**, em um modelo **star schema**:
+
+- `fato_mensagens`: 49.278 mensagens (tabela fato)
+- `dim_clientes`: 12.000 clientes (dimensão)
+
+As consultas ficam em [`sql/bigquery/01_consultas_iniciais.sql`](sql/bigquery/01_consultas_iniciais.sql)
+(JOIN, GROUP BY, COUNTIF, mediana com `APPROX_QUANTILES` e função de janela com `ROW_NUMBER`).
+
+Exemplo: a consulta de mensagens negativas por mês encontra sozinha o evento de instabilidade do aplicativo.
+
+| Mês | Mensagens | % negativas | Sobre o aplicativo |
+|---|---|---|---|
+| 2025-10 | 2.722 | 46,6% | 324 |
+| **2025-11** | **4.642** | **64,6%** | **1.320** |
+| 2025-12 | 2.870 | 48,1% | 333 |
+
+Para reproduzir: crie um dataset no BigQuery e carregue os arquivos Parquet de `data/processed/`
+(pelo console: **Criar tabela → Fazer upload → Parquet**).
+
 ## Dashboard
 
 Estilo Power BI, com indicadores, filtros globais e uma página **"A História"** que conta, em 4 capítulos,
@@ -122,16 +150,18 @@ banksense-ai/
 ├── docs/                 # premissas da geração
 ├── reports/              # relatório de qualidade
 ├── sql/migrations/       # schema e índices
+├── sql/bigquery/         # consultas no BigQuery
 ├── sql/consultas_exemplo.sql
 ├── src/banksense/
 │   ├── dados/            # gerador, premissas, textos, limpeza
-│   └── db/               # conexão, migrations, carga
+│   ├── db/               # conexão, migrations, carga
+│   └── logs.py           # configuração de logs
 └── tests/
 ```
 
 ## Tecnologias
 
-Python · Pandas · NumPy · PostgreSQL · SQLAlchemy · Docker Compose · Streamlit · Plotly · Pytest
+Python · Pandas · NumPy · PostgreSQL · SQLAlchemy · Docker Compose · BigQuery (Google Cloud) · Streamlit · Plotly · Pytest · logging
 (em seguida: SciPy, Statsmodels, Scikit-learn, FastAPI, Pydantic, Joblib)
 
 ## Summary (English)
@@ -139,7 +169,8 @@ Python · Pandas · NumPy · PostgreSQL · SQLAlchemy · Docker Compose · Strea
 **BankSense AI** is an end-to-end data science portfolio project about customer messages of a *fictional* Brazilian
 digital bank. All data is **synthetic** and generated from documented assumptions. Done so far: Dockerized PostgreSQL,
 a reproducible generator of 50,000 Portuguese messages (slang, typos, irony, controlled data-quality issues),
-a cleaning pipeline with a data-quality report, and a Power BI-style Streamlit dashboard with data storytelling.
+a cleaning pipeline with a data-quality report and logging, the data loaded into BigQuery (Google Cloud) as a
+star schema with SQL analyses, and a Power BI-style Streamlit dashboard with data storytelling.
 Next: statistics notebooks, sentiment classifier (TF-IDF + Logistic Regression), complaint volume forecasting and a FastAPI service.
 
 ---

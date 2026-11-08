@@ -12,6 +12,9 @@ from sqlalchemy import Engine, text
 from banksense import config
 from banksense.db import obter_engine
 from banksense.db.migracoes import aplicar_migracoes
+from banksense.logs import obter_logger
+
+log = obter_logger("banksense.carga")
 
 COLUNAS_MENSAGENS = ["id_mensagem", "id_cliente", "data_mensagem", "canal", "categoria", "texto",
                      "sentimento_referencia", "regiao"]
@@ -45,8 +48,14 @@ def carregar(mensagens: pd.DataFrame, clientes: pd.DataFrame, engine: Engine | N
 def main() -> None:
     mensagens = pd.read_parquet(config.ARQ_MENSAGENS_TRATADO)
     clientes = pd.read_parquet(config.ARQ_CLIENTES_TRATADO)
-    for tabela, qtd in carregar(mensagens, clientes).items():
-        print(f"{tabela}: {qtd:,} linhas")
+    log.info("Carga iniciada: %s mensagens e %s clientes", f"{len(mensagens):,}", f"{len(clientes):,}")
+    try:
+        contagens = carregar(mensagens, clientes)
+    except Exception:
+        log.exception("Falha na carga. O PostgreSQL está rodando? (docker compose up -d)")
+        raise
+    for tabela, qtd in contagens.items():
+        log.info("%s: %s linhas", tabela, f"{qtd:,}")
 
 
 if __name__ == "__main__":

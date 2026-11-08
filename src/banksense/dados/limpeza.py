@@ -19,6 +19,9 @@ import numpy as np
 import pandas as pd
 
 from banksense import config
+from banksense.logs import obter_logger
+
+log = obter_logger("banksense.limpeza")
 
 CANAIS_VALIDOS = ("app", "chat", "telefone", "redes_sociais", "email", "ouvidoria")
 REGIOES_VALIDAS = ("Sudeste", "Nordeste", "Sul", "Norte", "Centro-Oeste")
@@ -251,9 +254,23 @@ ainda não foram resolvidas: é um nulo **esperado**, não um erro.
 
 
 def main() -> None:
+    if not config.ARQ_MENSAGENS_BRUTO.exists():
+        log.error("Arquivo bruto não encontrado: %s. Rode antes: python -m banksense.dados.gerador",
+                  config.ARQ_MENSAGENS_BRUTO)
+        raise SystemExit(1)
     mensagens = pd.read_csv(config.ARQ_MENSAGENS_BRUTO, dtype={"nota_satisfacao": "string"})
     clientes = pd.read_csv(config.ARQ_CLIENTES_BRUTO)
+    log.info("Limpeza iniciada: %s mensagens brutas", f"{len(mensagens):,}")
     df, cli, rel = limpar(mensagens, clientes)
+    log.info("Duplicatas exatas removidas: %s", f"{rel.duplicatas_exatas:,}")
+    log.info("Linhas sem texto removidas: %s", f"{rel.linhas_removidas_sem_texto:,}")
+    if rel.datas_invalidas:
+        log.warning("Datas inválidas: %s", f"{rel.datas_invalidas:,}")
+    if rel.notas_fora_da_faixa or rel.tempos_negativos:
+        log.warning("Valores fora da faixa viraram nulo: %s notas, %s tempos negativos",
+                    f"{rel.notas_fora_da_faixa:,}", f"{rel.tempos_negativos:,}")
+    if rel.ids_repetidos_restantes:
+        log.warning("IDs de mensagem ainda repetidos após a limpeza: %s", f"{rel.ids_repetidos_restantes:,}")
 
     config.DIR_TRATADOS.mkdir(parents=True, exist_ok=True)
     config.DIR_RELATORIOS.mkdir(parents=True, exist_ok=True)
@@ -263,8 +280,8 @@ def main() -> None:
         json.dumps(asdict(rel), indent=2, ensure_ascii=False), encoding="utf-8"
     )
     (config.DIR_RELATORIOS / "qualidade_dados.md").write_text(relatorio_markdown(rel), encoding="utf-8")
-    print(f"Brutas: {rel.linhas_brutas:,} | Tratadas: {rel.linhas_tratadas:,}")
-    print(f"Relatório: {config.DIR_RELATORIOS / 'qualidade_dados.md'}")
+    log.info("Limpeza concluída: %s brutas -> %s tratadas", f"{rel.linhas_brutas:,}", f"{rel.linhas_tratadas:,}")
+    log.info("Relatório: %s", config.DIR_RELATORIOS / "qualidade_dados.md")
 
 
 if __name__ == "__main__":
